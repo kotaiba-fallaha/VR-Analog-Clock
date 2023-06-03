@@ -1,0 +1,1836 @@
+#VRML V2.0 utf8
+
+#==================================================================================#
+#==================================================================================#
+#==================================================================================#
+Viewpoint {	    position 7 0.8 0.7	orientation 0.0 1.0 0.0 1.3	 }
+#Viewpoint {	    position -2.5 0.8 -.5	orientation 0.0 1.0 0.0 1.57	 }
+#==================================================================================#
+#==================================================================================#
+#==================================================================================#
+NavigationInfo {
+    type [ "FLY", "ANY" ]
+    headlight FALSE
+    speed 2.0
+}
+#==================================================================================#
+#==================================Out Light=======================================#
+#==================================================================================# 
+DEF OutLight DirectionalLight {
+    ambientIntensity 1
+    direction -0.5 -1.0 0.5
+	intensity 1
+}								 
+#==================================================================================#
+#===============================Out Light Animation================================#
+#==================================================================================#
+DEF DayTimer TimeSensor {
+    cycleInterval 86400.0   # 60*60*12 seconds per sweep
+    loop TRUE
+    startTime 79200.0 # Adjust for Syria Standard Time
+        		# start time of 0 is midnight Grenwich Mean Time (GMT)
+        		# Syria Time is 2 hours after GMT       
+    stopTime -1.0 
+} 
+DEF LightIntensity ScalarInterpolator {
+    key [ 0 0.2083 0.25 0.5 0.7083 0.75 1 ]#time values 0 5 6 12 17 18 24
+    keyValue [ 0 0 1 1 1 0 0]
+}
+ROUTE DayTimer.fraction_changed   TO LightIntensity.set_fraction
+ROUTE LightIntensity.value_changed  TO OutLight.set_intensity			
+#==================================================================================#
+#===================================Sky============================================#
+#==================================================================================#	   
+Background {
+    skyColor [
+        0.0 0.0 1.0,
+        0.0 0.5 1.0,
+        0.7 0.7 1.0,
+    ]
+    skyAngle [
+        1.371,
+        1.571,
+    ]
+}				 
+#==================================================================================#
+#====================================XYZ===========================================#
+#==================================================================================#
+#DEF XYZ Transform { 
+#    children [	
+#    # Hands
+#        DEF XHand Transform { 
+#            rotation 0 0 1 -1.57
+#            # animated rotation
+#            children [
+#            # Arm
+#                Shape {
+#                    appearance DEF Red Appearance {
+#                        material Material { diffuseColor 1 0 0 }
+#                    }
+#                    geometry Cylinder {
+#                        radius 0.17
+#                        height 3.0
+#                    }
+#                }
+#            # Pointy end
+#                DEF ArrowHead Transform {
+#                    translation 0.0 1.9 0.0
+#                    children Shape {
+#                        appearance Appearance {
+#                        	material Material {}
+#                    	}
+#                        geometry Cone {
+#                            bottomRadius 0.4
+#                            height 0.8
+#                        }
+#                    }
+#                }
+#            ]
+#        }
+#        DEF YHand Transform {
+#			translation 0.0 -1 0.0				 	 
+#            children [
+#				Shape {
+#                    appearance DEF Green Appearance {
+#                        material Material { diffuseColor 0 1 0 }
+#                    }
+#                    geometry Cylinder {
+#                        radius 0.17
+#                        height 3.0
+#                    }
+#                }
+#				USE ArrowHead 
+#			]
+#        }
+#        DEF ZHand Transform {		
+#            rotation 1 0 0 1.57	  
+#            children [
+#				Shape {
+#                    appearance DEF Blue Appearance {
+#                        material Material { diffuseColor 0 0 1 }
+#                    }
+#                    geometry Cylinder {
+#                        radius 0.17
+#                        height 3.0
+#                    }
+#                }
+#				USE ArrowHead 
+#			]
+#        }	
+#    ]
+#}				 
+#==================================================================================#
+#===================================Beach==========================================#
+#==================================================================================#
+Shape {
+    appearance Appearance {
+        material Material { }
+        texture ImageTexture { url "sand.jpg" }
+        textureTransform TextureTransform { scale 10.0 10.0 }
+    }
+    geometry IndexedFaceSet {
+        coord Coordinate {
+            point [
+                -50.0 -1.0  50.0,
+                 50.0 -1.0  50.0,
+                 50.0 -1.0 -50.0,
+                -50.0 -1.0 -50.0,
+            ]
+        }
+        coordIndex [ 0, 1, 2, 3 ]
+        solid FALSE
+    }
+}				 
+#==================================================================================#
+#=================================Palm trees=======================================#
+#==================================================================================#   
+Transform {
+    translation -3.0 -1.0 -10.0
+    children [
+        DEF Palm Group {
+            children [
+            # Palm tree - in a billboard so it is never edge-on
+                Billboard {
+                    children [
+                        Shape {
+                            appearance Appearance {
+                                material NULL  # emissive texturing
+                                texture ImageTexture { url "palm.png" }
+                            }
+                            geometry IndexedFaceSet {
+                                coord Coordinate {
+                                    point [
+                                        -2.5  0.0 0.0,
+                                         2.5  0.0 0.0,
+                                         2.5 11.25 0.0,
+                                        -2.5 11.25 0.0,
+                                    ]
+                                }
+                                coordIndex [ 0, 1, 2, 3 ]
+                                texCoord TextureCoordinate {
+                                        point [
+                                                0.0 0.0,
+                                                1.0 0.0,
+                                                1.0 1.0,
+                                                0.0 1.0,
+                                        ]
+                                }
+                                texCoordIndex [ 0, 1, 2, 3 ]
+                                solid FALSE
+                            }
+                        }
+                    ]
+                }
+            # Fake tree shadow - a black semi-transparent rectangle with
+            # a texture map to give it the right shape
+                Shape {
+                    appearance Appearance {
+                        material Material {
+                                diffuseColor 0.0 0.0 0.0
+                                transparency 0.5
+                        }
+                        texture ImageTexture { url "palmsh.png" }
+                    }
+                    geometry IndexedFaceSet {
+                        coord Coordinate {
+                            point [
+                                -2.5  0.05  2.5,
+                                 2.5  0.05  2.5,
+                                 2.5  0.05 -2.5,
+                                -2.5  0.05 -2.5,
+                            ]
+                        }
+                        coordIndex [ 0, 1, 2, 3 ]
+                        texCoord TextureCoordinate {
+                                point [
+                                        0.0 0.0,
+                                        1.0 0.0,
+                                        1.0 1.0,
+                                        0.0 1.0,
+                                ]
+                        }
+                        texCoordIndex [ 0, 1, 2, 3 ]
+                        solid FALSE
+                    }
+                }
+            ]
+        }
+    ]
+}
+Transform { translation -5.0 -1.0  -6.0 scale 0.6 0.6 0.6 children USE Palm }
+Transform { translation  5.0 -1.0  -9.0 children USE Palm }
+Transform { translation 10.0 -1.0 -15.0 children USE Palm }				 
+#==================================================================================#
+#===================================Floor==========================================#
+#==================================================================================#   
+#  This is a simple rectangular floor textured with a stone block
+#  image.  An ElevationGrid node is used so that the floor is made
+#  up of multiple polygons, each subject to individual lighting
+#  calculations.  This insures that when a PointLight is placed
+#  over the floor, the area underneath is bright, while the areas at
+#  the corners are not.
+#
+Transform {
+	translation -5.0 -0.99 0	   
+	children DEF Floor Shape {
+		appearance Appearance {
+			material Material { diffuseColor 1.0 1.0 1.0 }
+			texture ImageTexture { url "granit_g.jpg" }
+			textureTransform TextureTransform {
+				scale 16.0 8.0
+			}
+		}
+		geometry ElevationGrid {
+			xDimension 8
+			zDimension 8
+			xSpacing   1.4285714
+			zSpacing   0.7142857
+			solid      FALSE
+			height [
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			]
+		}
+	}
+}
+Transform { translation -5.0 -0.99 -5 children USE Floor }	 		 
+#==================================================================================#
+#==================================Ceiling=========================================#
+#==================================================================================#   
+#  (reuse the floor)
+    Transform { translation -5.0 2.51 0 children USE Floor }
+    Transform { translation -5.0 2.51 -5 children USE Floor } 	 
+#==================================================================================#
+#==================================Front wall======================================#
+#==================================================================================# 
+Transform {
+    translation -5.0 -0.99 0.0
+    children [
+        Transform {
+            translation 0.0 0.0 2.5
+            children DEF Wall Transform {
+				translation 0.0 3.5 -2.5
+				rotation 0.0 0.0 1.0 -1.57
+				children Shape {
+					appearance Appearance {
+						material Material { diffuseColor 1.0 1.0 1.0 }
+						texture ImageTexture { url "stonewal.jpg" }
+						textureTransform TextureTransform { scale 2 3 }
+					}
+					geometry ElevationGrid {
+						xDimension 8
+						zDimension 8
+						xSpacing   0.5
+						zSpacing   0.7142857
+						solid      FALSE
+						height [
+							0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+							0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+							0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+							0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+							0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+							0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+							0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+							0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+						]
+					}
+				}
+			}
+        }
+        Transform { translation 0.0 0.0 -2.5 children USE Wall }  
+    ]
+}	 
+#==================================================================================#
+#===================================Left wall======================================#
+#==================================================================================#
+Transform {
+    translation 0.0 -0.99 4.99
+	rotation 0 1 0 -1.57
+    children [
+        Transform { translation 0.0 0.0  2.5 children USE Wall }
+        Transform { translation 0.0 0.0 -2.5 children USE Wall } 
+    ]
+}
+#==================================================================================#
+#===============================right (Window) wall================================#
+#==================================================================================#
+Transform {
+    translation 0.0 -0.99 0.0
+    children [
+		Transform {
+			translation 0.0 0 -5.0
+			children DEF Door Shape  {
+				appearance Appearance {
+					material Material { diffuseColor 1.0 1.0 1.0 }
+					texture ImageTexture { url "stonewal.jpg" }
+					textureTransform TextureTransform { scale 2 3 }
+				}
+				geometry IndexedFaceSet {
+					coord Coordinate {
+						point [
+							-5.0 0.0 0.0, -1.5 0.0 0.0,
+							-1.5 2.5 0.0,  1.5 2.5 0.0,
+							 1.5 0.0 0.0,  5.0 0.0 0.0,
+							 5.0 3.5 0.0, -5.0 3.5 0.0,
+						]
+					}
+					texCoord TextureCoordinate {
+						point [
+							0.0 0.0,  0.7 0.0,  0.7 0.7,  1.3 0.7,
+							1.3 0.0,  2.0 0.0,  2.0 1.0,  0.0 1.0
+						]
+					}
+					coordIndex [ 0, 1, 2, 3, 4, 5, 6, 7 ]
+					convex FALSE
+					solid FALSE
+				}
+			}
+		} 
+		Transform {			  
+    		children [
+        		Transform {
+            		translation -1.5 0 -5  
+            		children Transform {		  
+						rotation 1.0 0.0 0.0 -1.57
+						children Shape {
+							appearance Appearance {
+								material Material { diffuseColor 1.0 1.0 1.0 }
+								texture ImageTexture { url "stonewal.jpg" }
+								textureTransform TextureTransform { scale 2 1 }
+							}
+							geometry ElevationGrid {
+								xDimension 6
+								zDimension 3
+								xSpacing   0.65
+								zSpacing   0.55
+								solid      FALSE
+								height [					
+									0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+									0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+									0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  
+								]
+							}
+						}
+					}
+        		}														  
+    		]
+		}
+	]
+}
+#==================================================================================#
+#====================================door wall=====================================#
+#==================================================================================#
+Transform { translation 4.99 -0.99 0.0 rotation 0 1 0 -1.57 children USE Door }  
+#==================================================================================#
+#======================================Table=======================================#
+#==================================================================================#
+
+#  Table
+#
+#
+Transform { 
+	translation	0 -0.99 0
+	children [
+	#  Table top
+	#
+	Transform {
+    	translation 0.0 0.615 0.0
+    	children [
+		Shape {
+	    	appearance DEF Brown Appearance {
+			material Material {
+		    	diffuseColor 0.6 0.35 0.0
+			}
+	    	}
+	    	geometry Cylinder {
+			radius 0.7
+			height 0.03
+	    	}
+		}
+    	]
+	}
+
+	#
+	#  Table leg
+	#
+	Transform {
+    	translation 0.0 0.3075 0.0
+    	children [
+		Shape {
+	    	appearance USE Brown
+	    	geometry Box {
+			size 0.09 0.57 0.09
+	    	}
+		}
+    	]
+	}
+
+	#
+	#  Table leg base
+	#
+	Transform {
+    	translation 0.0 0.015 0.0
+    	children [
+		Shape {
+	    	appearance USE Brown
+	    	geometry Box {
+			size 0.5 0.03 0.5
+	    	}
+		}
+    	]
+	}
+	Transform {
+    	translation 0.0 0.045 0.0
+    	children [
+		Shape {
+	    	appearance USE Brown
+	    	geometry Box {
+			size 0.35 0.03 0.35
+	    	}
+		}
+    	]
+	}
+]}
+
+
+#
+#  Chairs
+#
+Transform {
+    translation 0.95 -0.99 0.0
+    children DEF Chair Transform {
+		children [
+			Transform {
+    			translation 0.0 0.5 0.0
+    			children [
+				Shape {
+	    			appearance USE Brown
+	    			geometry Box {
+					size 0.39 0.03 0.41
+	    			}
+				}
+    			]
+			}
+
+			#
+			#  Chair legs
+			#
+			Transform {
+    			translation 0.1575 0.2485 0.1575
+    			children [
+				DEF Leg Shape {
+	    			appearance USE Brown
+	    			geometry Box {
+					size 0.03 0.497 0.03
+	    			}
+				}
+    			]
+			}
+			Transform {
+    			translation -0.1575 0.2485 0.1575
+    			children [ USE Leg ]
+			}
+			Transform {
+    			translation -0.1575 0.2485 -0.1575
+    			children [ USE Leg ]
+			}
+			Transform {
+    			translation 0.1575 0.2485 -0.1575
+    			children [ USE Leg ]
+			}
+
+			#
+			#  Chair back
+			#
+			Transform {
+    			translation 0.1875 0.5 0.0
+    			rotation 0.0 0.0 1.0 -0.17
+    			children [
+				Transform {
+	    			translation 0.0 0.54 0.0
+	    			children [
+					Shape {
+		    			appearance USE Brown
+		    			geometry Box {
+						size 0.06 0.17 0.43
+		    			}
+					}
+	    			]
+				}
+
+				Transform {
+	    			translation 0.0 0.2275 0.0
+	    			children [
+					DEF BackPole Shape {
+		    			appearance USE Brown
+		    			geometry Box {
+						size 0.02 0.455 0.02
+		    			}
+					}
+	    			]
+				}
+				Transform {
+	    			translation 0.0 0.2275 -0.083
+	    			children [ USE BackPole ]
+				}
+				Transform {
+	    			translation 0.0 0.2275 0.083
+	    			children [ USE BackPole ]
+				}
+				Transform {
+	    			translation 0.0 0.2275 -0.166
+	    			children [ USE BackPole ]
+				}
+				Transform {
+	    			translation 0.0 0.2275 0.166
+	    			children [ USE BackPole ]
+				}
+    			]
+			}
+		]
+	}
+}
+Transform {
+    translation -0.95 -0.99 0.0
+    rotation 0.0 1.0 0.0 3.14
+    children USE Chair
+}
+Transform {
+    translation 0.0 -0.99 0.95
+    rotation 0.0 1.0 0.0 -1.57
+    children USE Chair
+}
+Transform {
+    translation 0.0 -0.99 -0.95
+    rotation 0.0 1.0 0.0 1.57
+    children USE Chair
+}
+#==================================================================================#
+#======================================Lamp========================================#
+#==================================================================================#   
+Transform {
+	translation 0.0 2.3 0.0		
+	center    0.0 -1.5 0.0
+	children [		  
+        # Second arm - shade joint
+        Group {
+            children [	
+                DEF LampShade Transform {	
+                    children [	 
+			        	Transform {
+			        		translation 0.0 0.15 0.0
+			        		children [						   
+			            		Shape {
+			            			appearance Appearance {
+			                			material Material {
+			                				diffuseColor 1.0 1.0 1.0
+			                			}
+			            			}
+			            			geometry Cylinder {
+			                			radius 0.02
+			                			height 0.11
+			            			}
+			            		}
+			        		]
+			        	}
+                        # Light bulb
+                        Transform {
+                            translation 0.0 -0.1 0.0
+                            children [
+				    			DEF LampLight PointLight {
+    								on TRUE 
+									intensity 1.0 
+									ambientIntensity 1.0 
+									color 1.0 1.0 1.0 
+									location 0.0 -3 0.0
+									radius 12.0				
+								}
+				    			Shape {
+                                    appearance Appearance {
+                                        material DEF BulbMaterial Material {
+                                        	diffuseColor 1 1 1
+                                        	emissiveColor 1 1 1
+                                        }
+                                    }
+                                    geometry Sphere {
+                                        radius 0.2
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+				}
+			]
+		}
+	]
+}			
+
+# Lamp Switch
+Transform {
+	translation -4.99 0.15 -3.5
+	rotation 0 0 1 1.57
+	children [
+		DEF lampSwitch TouchSensor { }
+		Transform {
+			translation	0 -0.01 0
+		children Shape {
+			appearance Appearance {
+			    material Material {
+			        diffuseColor 1 1 1
+			    }
+			}
+			geometry Cylinder {
+			    radius 0.07
+			    height 0.02
+			}
+		}}
+		Shape {
+			appearance Appearance {
+			    material Material {
+			        diffuseColor 0 0 0
+			    }
+			}
+			geometry Cylinder {
+			    radius 0.15
+			    height 0.01
+			}
+		}
+	]
+}
+#==================================================================================#
+#=================================lamp Animation===================================#
+#==================================================================================#   
+DEF Toggle Script {
+	field    SFBool on TRUE
+	eventIn  SFBool set_active
+	eventOut SFBool on_changed
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+
+			// toggle on button presses
+			if ( on == TRUE ) on = FALSE;
+			else              on = TRUE;
+			on_changed = on;
+		}"
+}
+
+DEF TransparencySelector Script {
+	field    SFFloat onTransparency  0.0
+	field    SFFloat offTransparency 0.77
+	eventIn  SFBool  set_selection
+	eventOut SFFloat on_changed
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_selection( b, tm ) {
+			if ( b == TRUE )
+				transparency_changed = onTransparency;
+			else
+				transparency_changed = offTransparency;
+			on_changed = transparency_changed;
+		}"
+}
+
+ROUTE lampSwitch.isActive TO Toggle.set_active
+ROUTE Toggle.on_changed    TO LampLight.set_on
+ROUTE Toggle.on_changed    TO TransparencySelector.set_selection
+ROUTE TransparencySelector.on_changed TO BulbMaterial.set_transparency		
+#==================================================================================#
+#======================================watch=======================================#
+#==================================================================================#
+DEF StopWatch Transform {
+    translation	-4.93 1 0
+	rotation 0 1 0 1.57
+    scale .15 .15 .15
+    children [
+    # Frame and face
+        Transform {
+            rotation 1.0 0.0 0.0  1.571
+            children [
+            # Frame
+                Shape {
+                    appearance Appearance {
+                        material Material { diffuseColor 0.7 0.3 0.0 }
+                    }
+                    geometry Cylinder {
+                        radius 4.8
+                        height 0.8
+                    }
+                }
+            # Face
+                Shape {
+                    appearance Appearance {
+                        material Material { diffuseColor 1.0 1.0 1.0 }
+                    }
+                    geometry Cylinder {
+                        radius 4.0
+                        height 0.9
+                    }
+                }
+            ]
+        }
+    # Date Inc button
+        Transform {
+            translation 3.5 3.5 0.0
+            rotation 0.0 0.0 1.0 -0.71
+            children  Anchor {
+				description	"+"
+				children [
+                	DEF dateIncButton TouchSensor { }
+                	Shape {
+                    	appearance Appearance {
+                        	material Material { diffuseColor 0.0 1.0 0.0 }
+                    	}
+                    	geometry DEF Button Cylinder {
+                        	radius 0.38
+                        	height 0.3
+                    	}
+                	}
+            	]
+			}
+        }
+    # Date Dec button
+        Transform {
+            translation 2.6 4.2 0.0
+            rotation 0.0 0.0 1.0 -0.65
+            children Anchor {
+				description	"-"
+				children [
+                	DEF dateDecButton TouchSensor { }
+                	Shape {
+                    	appearance Appearance {
+                        	material Material { diffuseColor 1.0 0.0 0.0 }
+                    	}
+                    	geometry USE Button
+                	}
+            	]
+			}
+        }
+	# Watch Increase Button
+		Transform {
+            translation -2.6 4.2 0.0
+            rotation 0.0 0.0 1.0 0.65
+            children Anchor {
+				description	"+"
+				children [
+                	DEF WatchIncButton TouchSensor { }
+                	Shape {
+                    	appearance Appearance {
+                        	material Material { diffuseColor 0.0 1.0 0.0 }
+                    	}
+                    	geometry USE Button
+                	}
+            	]
+			}
+        }
+    # Watch Decrease Button
+        Transform {
+            translation -3.5 3.5 0.0
+            rotation 0.0 0.0 1.0 0.71
+            children Anchor {
+				description	"-"
+				children [
+                	DEF WatchDecButton TouchSensor { }
+                	Shape {
+                    	appearance Appearance {
+                        	material Material { diffuseColor 1.0 0.0 0.0 }
+                    	}
+                    	geometry USE Button
+                	}
+            	]
+			}
+        }
+
+    # Hands
+        DEF MinuteHand Transform {
+            translation 0.0 1.5 0.6
+            center 0.0 -1.5 0.6
+            # animated rotation
+            children [
+            # Arm
+                DEF Arm Shape {
+                    appearance DEF Black Appearance {
+                        material Material { diffuseColor 0.2 0.2 0.2 }
+                    }
+                    geometry Cylinder {
+                        radius 0.17
+                        height 3.0
+                    }
+                }
+            # Pointy end
+                DEF ArrowHeadC Transform {
+                    translation 0.0 1.9 0.0
+                    children Shape {
+                        appearance USE Black
+                        geometry Cone {
+                            bottomRadius 0.4
+                            height 0.8
+                        }
+                    }
+                }
+            ]
+        }
+        DEF HourHand Transform {
+            translation 0.0 1.5 0.6
+            center 0.0 -1.5 0.6
+            # animated rotation
+            scale 1.0 0.7 1.0
+            children [ USE Arm, USE ArrowHeadC ]
+        }
+        DEF SecondHand Transform {
+            translation 0.0 1.5 0.6
+            center 0.0 -1.5 0.6
+            # animated rotation
+            scale 0.6 1.0 0.6
+            children [ USE Arm, USE ArrowHeadC ]
+        }
+		# Sweep
+        DEF pendulumHand Transform {
+            translation 0.0 -2.3 0
+            center 0.0 -1.9 0.6	 
+			rotation 0 0 1 -2.5
+            scale 1.5 1.5 1
+            children [ USE Arm, USE ArrowHeadC ]
+        }
+		# Watch Numbers 
+        Transform {
+            translation -0.3 3 0.3
+            center 0.0 -1.5 0.6	
+            scale 0.6 1.0 0.6
+            children Shape {
+                appearance DEF num Appearance {
+                    material Material { diffuseColor 0.0 0.0 0.0 }
+                }
+                geometry Text {
+                    string "12"
+                }
+            } 
+        }
+        Transform {
+            translation 3.3 -0.3 0.3
+            center 0.0 -1.5 0.6	
+            scale 0.6 1.0 0.6
+            children Shape {
+                appearance USE num
+                geometry Text {
+                    string "3"
+                }
+            }	 
+        }
+        Transform {
+            translation -0.15 -3.6 0.3
+            center 0.0 -1.5 0.6	
+            scale 0.6 1.0 0.6
+            children Shape {
+                appearance USE num
+                geometry Text {
+                    string "6"
+                }
+            }  
+        }
+        Transform {
+            translation -3.6 -0.3 0.3
+            center 0.0 -1.5 0.6
+            scale 0.6 1.0 0.6
+            children Shape {
+                appearance USE num
+                geometry Text {
+                    string "9"
+                }
+            }
+        }
+		# AM PM	 Panel
+        Transform {
+            translation -0.3 2 0.3
+            center 0.0 -1.5 0.6	
+            scale 0.6 1.0 0.6
+            children [
+				DEF ampmButton TouchSensor { }
+				Transform {
+            	translation 0.6 0.25 0
+				children DEF ContainerBox  Shape {
+						appearance Appearance {
+							material Material { transparency 1}
+						}
+                		geometry Box {
+							size 2 1 0
+                    	
+                		}
+					}
+				}
+				Shape {
+                	appearance USE num
+                	geometry DEF ampm Text {
+                    	string "AM"
+                	}
+            	}
+			]
+        }
+		# Date Panel
+        Transform {
+            translation 0 -2 0.3
+            center 0.0 -1.5 0.6	
+            scale 0.6 1.0 0.6
+            children [
+				#Day				  
+				Transform {
+            		translation -2.5 0 0
+					children[ 
+						DEF DayButton TouchSensor { }
+						Transform {translation 0.5 0.25 0 scale 0.5 1 1 children USE ContainerBox }
+						Shape {
+                			appearance USE num
+                			geometry DEF Day Text {
+                    			string "22"
+                			}
+            			}
+					]
+				}
+				#Month
+				Transform {
+            		translation -1 0 0
+					children[ 
+						DEF MonthButton TouchSensor { }
+						Transform {translation 0.5 0.25 0 scale 0.5 1 1 children USE ContainerBox }
+						Shape {
+                			appearance USE num
+                			geometry DEF Month Text {
+                    			string "2"
+                			}
+            			}
+					]
+				}
+				#Year
+				Transform {
+            		translation 0.5 0 0
+					children[ 
+						DEF YearButton TouchSensor { }
+						Transform {translation 1 0.25 0 scale 1 1 1 children USE ContainerBox }
+						Shape {
+                			appearance USE num
+                			geometry DEF Year Text {
+                    			string "2024"
+                			}
+            			}
+					]
+				}
+
+			]
+        }
+    ]
+}		
+#==================================================================================#
+#======================================Alarm=======================================#
+#==================================================================================#
+DEF AlarmContainer  Transform {
+    translation	-4.93 0.5 -1
+	rotation 0 1 0 1.57
+    scale .1 .1 .1
+    children [
+    # Frame and face
+        Transform {
+            rotation 1.0 0.0 0.0  1.571
+            children [
+            # Frame
+                Shape {
+                    appearance Appearance {
+                        material Material { diffuseColor 0.7 0.3 0.0 }
+                    }
+                    geometry Cylinder {
+                        radius 4.8
+                        height 0.8
+                    }
+                }
+            # Face
+                Shape {
+                    appearance Appearance {
+                        material Material { diffuseColor 1.0 1.0 1.0 }
+                    }
+                    geometry Cylinder {
+                        radius 4.0
+                        height 0.9
+                    }
+                }
+            ]
+        }  
+		# On Off Panel
+        Transform {
+            translation -0.5 2 0.6
+            scale 1 1 1
+            children [
+				DEF onoffButton TouchSensor { }
+				Transform {
+            	translation 0.6 0.25 0
+				children USE ContainerBox
+				}
+				Shape {
+                	appearance USE num
+                	geometry DEF onoff Text {
+                    	string "OFF"
+                	}
+            	}
+			]
+        }
+		# Time Panel
+        Transform {
+            translation 0 -0.3 0.6	
+            scale 1 1 1
+            children [
+				#Houre				  
+				Transform {
+            		translation -2 0 0
+					children[ 
+						DEF hButton TouchSensor { }
+						Transform {translation 0.5 0.25 0 scale 0.5 1 1 children USE ContainerBox }
+						Shape {
+                			appearance USE num
+                			geometry DEF h Text {
+                    			string "00"
+                			}
+            			}
+					]
+				}
+				# Minute 
+				Transform {
+            		translation -.5 0 0
+					children[ 
+						DEF mButton TouchSensor { }
+						Transform {translation 0.5 0.25 0 scale 0.5 1 1 children USE ContainerBox }
+						Shape {
+                			appearance USE num
+                			geometry DEF m Text {
+                    			string "00"
+                			}
+            			}
+					]
+				}
+				# Period 
+				Transform {
+            		translation 1 0 0
+					children[ 
+						DEF pButton TouchSensor { }
+						Transform {translation 1 0.25 0 scale 1 1 1 children USE ContainerBox }
+						Shape {
+                			appearance USE num
+                			geometry DEF p Text {
+                    			string "AM"
+                			}
+            			}
+					]
+				}
+
+			]
+        }
+    ]
+}
+#==================================================================================#
+#==============================Watch Cycle Animation===============================#
+#==================================================================================# 
+DEF SecondTimer TimeSensor {
+    cycleInterval 60.0      # 60 seconds per sweep
+    loop TRUE
+    startTime 0.0
+    stopTime -1.0
+}
+DEF pendulumTimer TimeSensor {
+    cycleInterval 1.0      # 60 seconds per sweep
+    loop TRUE
+    startTime 0.0
+    stopTime -1.0
+}
+DEF MinuteTimer TimeSensor {
+    cycleInterval 3600.0    # 60*60 seconds per sweep
+    loop TRUE
+    startTime 0.0
+    stopTime -1.0  
+}
+DEF HourTimer TimeSensor {
+    cycleInterval 43200.0   # 60*60*12 seconds per sweep
+    loop TRUE
+    startTime 36000.0 # Adjust for Syria Standard Time
+        		# start time of 0 is midnight Grenwich Mean Time (GMT)
+        		# Syria Time is 2 hours after GMT       
+    stopTime -1.0 
+}
+
+
+DEF SecondSpinner OrientationInterpolator {
+    key [ 0.0, 0.5, 1.0 ]
+    keyValue [ 0.0 0.0 1.0 0.0,  0.0 0.0 1.0 -3.14,  0.0 0.0 1.0 -6.28 ]
+}
+DEF pendulum OrientationInterpolator {
+    key [ 0.0, 0.5, 1.0 ]
+    keyValue [ 0.0 0.0 1.0 -2.5,  0.0 0.0 1.0 2.5,  0.0 0.0 1.0 -2.5]
+}
+DEF MinuteSpinner OrientationInterpolator {
+    key [ 0.0, 0.5, 1.0 ]
+    keyValue [ 0.0 0.0 1.0 0.0,  0.0 0.0 1.0 -3.14,  0.0 0.0 1.0 -6.28 ]
+}
+DEF HourSpinner OrientationInterpolator {
+    key [ 0.0, 0.5, 1.0 ]
+    keyValue [ 0.0 0.0 1.0 0.0,  0.0 0.0 1.0 -3.14,  0.0 0.0 1.0 -6.28 ]
+}
+																 
+ROUTE SecondTimer.fraction_changed TO SecondSpinner.set_fraction
+ROUTE pendulumTimer.fraction_changed TO pendulum.set_fraction
+ROUTE MinuteTimer.fraction_changed TO MinuteSpinner.set_fraction
+ROUTE HourTimer.fraction_changed   TO HourSpinner.set_fraction
+ROUTE SecondSpinner.value_changed  TO SecondHand.set_rotation
+ROUTE pendulum.value_changed	    TO pendulumHand.set_rotation
+ROUTE MinuteSpinner.value_changed  TO MinuteHand.set_rotation
+ROUTE HourSpinner.value_changed    TO HourHand.set_rotation
+
+
+#==================================================================================#
+#================================Adjust Watch date=================================#
+#==================================================================================# 
+DEF adjWatch Script {					   	 
+    field    SFNode Day USE Day	 
+    field    SFNode Month USE Month	 
+    field    SFNode Year USE Year	 
+    field    SFNode ampm USE ampm	   	 
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+
+			date = new Date();
+			d = date.getDate();
+			m = date.getMonth()+1;
+			y = date.getFullYear();   
+			a = date.getHours() >= 12 ? 'PM' : 'AM'; 						    
+
+			Day.string = new MFString(d); 						    
+			Month.string = new MFString(m); 						    
+			Year.string = new MFString(y); 						    
+			ampm.string = new MFString(a);			   
+						  
+		}"
+}
+ROUTE SecondTimer.isActive TO adjWatch.set_active
+#==================================================================================#
+#======================================Adjust Alarm================================#
+#==================================================================================#
+Sound {
+	source DEF sound AudioClip { url "alarm.mp3" }  
+} 
+DEF AlarmCheck  Script {
+	field    SFNode sound USE sound
+	#alarm		     
+	field    SFNode onoff USE onoff
+	field    SFNode h USE h
+	field    SFNode m USE m
+	field    SFNode p USE p 			
+	#watch						   	
+	field	SFNode SecondTimer USE SecondTimer
+	field	SFNode MinuteTimer USE MinuteTimer
+	field	SFNode HourTimer USE HourTimer
+	field	SFNode ampm USE ampm
+
+	field	SFNode year USE Year 	   	 
+	eventIn  SFFloat set_fraction 
+	eventOut SFTime	soundStart
+	eventOut SFTime	soundEnd
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_fraction( b, tm ) { 
+			// watch seconds 
+			//ws = SecondTimer.fraction_changed*SecondTimer.cycleInterval;
+			// watch minute
+			//wm = (MinuteTimer.fraction_changed*MinuteTimer.cycleInterval)/60;
+			// watch hour 
+			//wh = (HourTimer.fraction_changed*HourTimer.cycleInterval)/3600;
+			//wampm = ampm.string;
+			//if(wampm == 'PM')
+			//	wh = wh + 12;
+
+
+			// alarm minute
+			am = parseFloat(m.string);					  
+			// alarm hour
+			ah = parseFloat(h.string);					 
+			ah = ah + (am/60);//add alarm minutes
+			//  adjust to match watch timer fraction 
+			am = am * 60 / 3600;	 // value between [0 1]						 				 
+		    ah = ah * 3600 / 43200;	  // value between [0 1] 
+			// alarm period 																		  
+
+			aampm = new MFString(p.string);
+			wampm = new MFString(ampm.string);	
+			ah = ah.toFixed(4);
+			am = am.toFixed(4);
+			wh = HourTimer.fraction_changed.toFixed(4);
+			wm = MinuteTimer.fraction_changed.toFixed(4); 
+
+			if(onoff.string == 'OFF')
+				soundEnd = MinuteTimer.time;
+
+			if(onoff.string == 'ON')
+				if((aampm == 'PM' && wampm == 'PM')||(aampm == 'AM' && wampm == 'AM'))
+					if(ah == wh)
+						if(am == wm){																				  
+							soundStart = MinuteTimer.time;		
+						}
+						//year.string = new MFString(ah,wh,am,wm,aampm,wampm,onoff.string);
+								  					   	  
+		}"
+} 
+ROUTE MinuteTimer.fraction_changed TO AlarmCheck.set_fraction
+ROUTE AlarmCheck.soundStart        TO sound.set_startTime
+ROUTE AlarmCheck.soundEnd        TO sound.set_stopTime
+#==================================================================================#
+#===========================Watch Inc & Dec (Hours & Min)==========================#
+#==================================================================================#
+DEF WatchDecrease Script {						   	 
+    field    SFNode Year USE Year			 	 
+    field    SFNode MinuteTimer USE MinuteTimer	 
+    field    SFNode HourTimer USE HourTimer
+	#alarm									 
+    field    SFNode onoff USE onoff
+	#	 
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+			
+			onoff.string = new MFString ('OFF');
+															
+			MinuteTimer.startTime = MinuteTimer.startTime+60;
+			HourTimer.startTime = HourTimer.startTime+60;																								
+						  
+		}"
+}
+DEF WatchIncrease Script {						   	 
+    field    SFNode Year USE Year 			 	 
+    field    SFNode MinuteTimer USE MinuteTimer	 
+    field    SFNode HourTimer USE HourTimer
+	#alarm									 
+    field    SFNode onoff USE onoff	 
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+			
+			onoff.string = new MFString ('OFF');													   						    
+													   						    
+			MinuteTimer.startTime = MinuteTimer.startTime+3540;
+			HourTimer.startTime = HourTimer.startTime+43140;	   									   														
+						  
+		}"
+}
+ROUTE WatchIncButton.isActive TO WatchIncrease.set_active
+ROUTE WatchDecButton.isActive TO WatchDecrease.set_active
+
+	 
+#==================================================================================#
+#=========================Watch & Alarm Choose to Change ==========================#
+#==================================================================================# 
+DEF ToggleDayButton Script {
+	field    SFNode DayButton USE DayButton
+	field    SFNode MonthButton USE MonthButton
+	field    SFNode YearButton USE YearButton
+	field    SFNode ampmButton USE ampmButton
+	#alarm
+	field    SFNode onoffButton USE onoffButton
+	field    SFNode hButton USE hButton
+	field    SFNode mButton USE mButton
+	field    SFNode pButton USE pButton	
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+									   		  
+			DayButton.enabled = FALSE;
+			MonthButton.enabled = TRUE;
+			YearButton.enabled = TRUE;
+			ampmButton.enabled = TRUE;   		  
+			onoffButton.enabled = TRUE;
+			hButton.enabled = TRUE;
+			mButton.enabled = TRUE;
+			pButton.enabled = TRUE;
+		}"
+}
+DEF ToggleMonthButton Script {
+	field    SFNode DayButton USE DayButton
+	field    SFNode MonthButton USE MonthButton
+	field    SFNode YearButton USE YearButton
+	field    SFNode ampmButton USE ampmButton
+	#alarm
+	field    SFNode onoffButton USE onoffButton
+	field    SFNode hButton USE hButton
+	field    SFNode mButton USE mButton
+	field    SFNode pButton USE pButton	
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+										
+			DayButton.enabled = TRUE;
+			MonthButton.enabled = FALSE;
+			YearButton.enabled = TRUE;
+			ampmButton.enabled = TRUE;   		  
+			onoffButton.enabled = TRUE;
+			hButton.enabled = TRUE;
+			mButton.enabled = TRUE;
+			pButton.enabled = TRUE;
+		}"
+}
+DEF ToggleYearButton Script {
+	field    SFNode DayButton USE DayButton
+	field    SFNode MonthButton USE MonthButton
+	field    SFNode YearButton USE YearButton
+	field    SFNode ampmButton USE ampmButton
+	#alarm
+	field    SFNode onoffButton USE onoffButton
+	field    SFNode hButton USE hButton
+	field    SFNode mButton USE mButton
+	field    SFNode pButton USE pButton	
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+										
+			DayButton.enabled = TRUE;
+			MonthButton.enabled = TRUE;
+			YearButton.enabled = FALSE;
+			ampmButton.enabled = TRUE;   		  
+			onoffButton.enabled = TRUE;
+			hButton.enabled = TRUE;
+			mButton.enabled = TRUE;
+			pButton.enabled = TRUE;
+		}"
+}
+DEF ToggleampmButton Script {
+	field    SFNode DayButton USE DayButton
+	field    SFNode MonthButton USE MonthButton
+	field    SFNode YearButton USE YearButton
+	field    SFNode ampmButton USE ampmButton
+	#alarm
+	field    SFNode onoffButton USE onoffButton
+	field    SFNode hButton USE hButton
+	field    SFNode mButton USE mButton
+	field    SFNode pButton USE pButton	
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+									   
+			DayButton.enabled = TRUE;
+			MonthButton.enabled = TRUE;
+			YearButton.enabled = TRUE;
+			ampmButton.enabled = FALSE;   		  
+			onoffButton.enabled = TRUE;
+			hButton.enabled = TRUE;
+			mButton.enabled = TRUE;
+			pButton.enabled = TRUE;
+		}"
+}
+DEF ToggleHButton Script {
+	field    SFNode DayButton USE DayButton
+	field    SFNode MonthButton USE MonthButton
+	field    SFNode YearButton USE YearButton
+	field    SFNode ampmButton USE ampmButton
+	#alarm
+	field    SFNode onoffButton USE onoffButton
+	field    SFNode hButton USE hButton
+	field    SFNode mButton USE mButton
+	field    SFNode pButton USE pButton	
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+									   		  
+			DayButton.enabled = TRUE;
+			MonthButton.enabled = TRUE;
+			YearButton.enabled = TRUE;
+			ampmButton.enabled = TRUE;   		  
+			onoffButton.enabled = TRUE;
+			hButton.enabled = FALSE;
+			mButton.enabled = TRUE;
+			pButton.enabled = TRUE;
+		}"
+}
+DEF ToggleMButton Script {
+	field    SFNode DayButton USE DayButton
+	field    SFNode MonthButton USE MonthButton
+	field    SFNode YearButton USE YearButton
+	field    SFNode ampmButton USE ampmButton
+	#alarm
+	field    SFNode onoffButton USE onoffButton
+	field    SFNode hButton USE hButton
+	field    SFNode mButton USE mButton
+	field    SFNode pButton USE pButton	
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+										
+			DayButton.enabled = TRUE;
+			MonthButton.enabled = TRUE;
+			YearButton.enabled = TRUE;
+			ampmButton.enabled = TRUE;   		  
+			onoffButton.enabled = TRUE;
+			hButton.enabled = TRUE;
+			mButton.enabled = FALSE;
+			pButton.enabled = TRUE;
+		}"
+}
+DEF TogglePButton Script {
+	field    SFNode DayButton USE DayButton
+	field    SFNode MonthButton USE MonthButton
+	field    SFNode YearButton USE YearButton
+	field    SFNode ampmButton USE ampmButton
+	#alarm
+	field    SFNode onoffButton USE onoffButton
+	field    SFNode hButton USE hButton
+	field    SFNode mButton USE mButton
+	field    SFNode pButton USE pButton	
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+									   
+			DayButton.enabled = TRUE;
+			MonthButton.enabled = TRUE;
+			YearButton.enabled = TRUE;
+			ampmButton.enabled = TRUE;   		  
+			onoffButton.enabled = TRUE;
+			hButton.enabled = TRUE;
+			mButton.enabled = TRUE;
+			pButton.enabled = FALSE;
+		}"
+}
+DEF ToggleonoffButton Script {
+	field    SFNode DayButton USE DayButton
+	field    SFNode MonthButton USE MonthButton
+	field    SFNode YearButton USE YearButton
+	field    SFNode ampmButton USE ampmButton
+	#alarm
+	field    SFNode onoffButton USE onoffButton
+	field    SFNode hButton USE hButton
+	field    SFNode mButton USE mButton
+	field    SFNode pButton USE pButton	
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+									   
+			DayButton.enabled = TRUE;
+			MonthButton.enabled = TRUE;
+			YearButton.enabled = TRUE;
+			ampmButton.enabled = TRUE;   		  
+			onoffButton.enabled = FALSE;
+			hButton.enabled = TRUE;
+			mButton.enabled = TRUE;
+			pButton.enabled = TRUE;
+		}"
+}
+	#watch
+ROUTE DayButton.isActive TO ToggleDayButton.set_active	
+ROUTE MonthButton.isActive TO ToggleMonthButton.set_active
+ROUTE YearButton.isActive TO ToggleYearButton.set_active
+ROUTE ampmButton.isActive TO ToggleampmButton.set_active
+	#alarm
+ROUTE hButton.isActive TO ToggleHButton.set_active	
+ROUTE mButton.isActive TO ToggleMButton.set_active
+ROUTE pButton.isActive TO TogglePButton.set_active
+ROUTE onoffButton.isActive TO ToggleonoffButton.set_active
+	 
+#==================================================================================#
+#====================(Watch & Alarm) (Inc & Dec) (Date & Period)===================#
+#==================================================================================#
+DEF dateIncrease Script {
+	#watch		 
+    field    SFNode Day USE Day	 
+    field    SFNode Month USE Month	 
+    field    SFNode Year USE Year	 
+    field    SFNode ampm USE ampm 
+	field    SFNode DayButton USE DayButton
+	field    SFNode MonthButton USE MonthButton
+	field    SFNode YearButton USE YearButton
+	field    SFNode ampmButton USE ampmButton
+	#alarm
+	field    SFNode onoffButton USE onoffButton
+	field    SFNode hButton USE hButton
+	field    SFNode mButton USE mButton
+	field    SFNode pButton USE pButton
+	field    SFNode onoff USE onoff
+	field    SFNode h USE h
+	field    SFNode min USE m
+	field    SFNode p USE p			   
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+			
+			////////////////////////////////////////Watch//////////////////////////////////
+			d = parseInt(Day.string);
+			m = parseInt(Month.string);
+			y = parseInt(Year.string);
+			a = ampm.string;
+			// Increase Day	if chosen 
+			if ( DayButton.enabled == FALSE ){	 
+				if ( (m == 1 || m == 3 || m == 5 || m == 7 || m == 8 || m == 10 || m == 12) && d == 31){
+					Day.string = new MFString (1);
+				}
+				else if ( (m == 4 || m == 6 || m == 9 || m == 11) && d == 30){
+					Day.string = new MFString (1);
+				}
+				else if ( m == 2 && y % 4 == 0 && d == 29){
+					Day.string = new MFString (1);
+				}
+				else if ( m == 2 && y % 4 != 0 && d == 28){
+					Day.string = new MFString (1);
+				}
+				else{
+					Day.string = new MFString (d+1);
+				}
+			}
+			// Increase Month if chosen 
+			if ( MonthButton.enabled == FALSE ){	
+				if ( m == 12 ){
+					Month.string = new MFString (1);
+					m = 1;
+				}
+				else{
+					Month.string = new MFString (m+1);
+					m = m+1;
+				}
+					 
+				if ( m == 2 && y % 4 != 0 && d > 28){
+					Day.string = new MFString (28);
+				}
+				else if ( m == 2 && y % 4 == 0 && d > 29){
+					Day.string = new MFString (29);
+				}
+				else if ( (m == 4 || m == 6 || m == 9 || m == 11) && d > 30){
+					Day.string = new MFString (30);
+				}
+			}
+			// Increase Year if chosen 
+			if ( YearButton.enabled == FALSE ){
+				Year.string = new MFString (y+1);
+				y = y+1;
+
+				if ( m == 2 && y % 4 != 0 && d > 28){
+					Day.string = new MFString (28);
+				}
+				else if ( m == 2 && y % 4 == 0 && d > 29){
+					Day.string = new MFString (29);
+				}
+			}
+			// Change AM PM if chosen 
+			if ( ampmButton.enabled == FALSE ){
+				if ( a == 'PM' ){
+					ampm.string = new MFString ('AM');
+				}
+				else{
+					ampm.string = new MFString ('PM');
+				}					
+			}
+			////////////////////////////////////////Alarm//////////////////////////////////
+			hour = parseInt(h.string);
+			minute = parseInt(min.string);
+			per = p.string;
+			o = onoff.string;
+			// Change Alarm hour if chosen 
+			if ( hButton.enabled == FALSE ){
+				onoff.string = new MFString ('OFF');
+				if ( hour == 11 ){
+					h.string = new MFString (00);
+				}
+				else{
+					h.string = new MFString (hour+1);
+				}					
+			}
+			// Change Alarm minute if chosen 
+			if ( mButton.enabled == FALSE ){
+				onoff.string = new MFString ('OFF'); 
+				if ( minute == 59 ){
+					min.string = new MFString (00);
+				}
+				else{
+					min.string = new MFString (minute+1);
+				}					
+			}
+			// Change Alarm AM PM if chosen 
+			if ( pButton.enabled == FALSE ){
+				onoff.string = new MFString ('OFF'); 
+				if ( per == 'PM' ){
+					p.string = new MFString ('AM');
+				}
+				else{
+					p.string = new MFString ('PM');
+				}					
+			}
+			// Change Alarm On Off if chosen 
+			if ( onoffButton.enabled == FALSE ){
+				if ( o == 'OFF' ){
+					onoff.string = new MFString ('ON');	
+				}
+				else{
+					onoff.string = new MFString ('OFF');
+				}					
+			} 						  
+		}"
+}
+DEF  dateDecrease  Script {
+	#watch		 
+    field    SFNode Day USE Day	 
+    field    SFNode Month USE Month	 
+    field    SFNode Year USE Year	 
+    field    SFNode ampm USE ampm 
+	field    SFNode DayButton USE DayButton
+	field    SFNode MonthButton USE MonthButton
+	field    SFNode YearButton USE YearButton
+	field    SFNode ampmButton USE ampmButton
+	#alarm
+	field    SFNode onoffButton USE onoffButton
+	field    SFNode hButton USE hButton
+	field    SFNode mButton USE mButton
+	field    SFNode pButton USE pButton
+	field    SFNode onoff USE onoff
+	field    SFNode h USE h
+	field    SFNode min USE m 
+	field    SFNode p USE p				 	 
+	eventIn  SFBool set_active	
+	directOutput TRUE
+
+	# use 'javascript' on newer browsers
+	url "vrmlscript:
+		function set_active( b, tm ) {
+			// ignore button releases
+			if ( b == FALSE ) return;
+			
+			////////////////////////////////////////Watch//////////////////////////////////
+			d = parseInt(Day.string);
+			m = parseInt(Month.string);
+			y = parseInt(Year.string);
+			a = ampm.string;
+			// Decrease Day	if chosen
+			if ( DayButton.enabled == FALSE ){	 
+				if ( (m == 1 || m == 3 || m == 5 || m == 7 || m == 8 || m == 10 || m == 12) && d == 1){
+					Day.string = new MFString (31);
+				}
+				else if ( (m == 4 || m == 6 || m == 9 || m == 11) && d == 1){
+					Day.string = new MFString (30);
+				}
+				else if ( m == 2 && y % 4 == 0 && d == 1){
+					Day.string = new MFString (29);
+				}
+				else if ( m == 2 && y % 4 != 0 && d == 1){
+					Day.string = new MFString (28);
+				}
+				else{
+					Day.string = new MFString (d-1);
+				}
+			}
+			// Decrease Month if chosen
+			if ( MonthButton.enabled == FALSE ){	
+				if ( m == 1 ){
+					Month.string = new MFString (12);
+					m = 12;
+				}
+				else{
+					Month.string = new MFString (m-1);
+					m = m-1;
+				}
+					 
+				if ( m == 2 && y % 4 != 0 && d > 28){
+					Day.string = new MFString (28);
+				}
+				else if ( m == 2 && y % 4 == 0 && d > 29){
+					Day.string = new MFString (29);
+				}
+				else if ( (m == 4 || m == 6 || m == 9 || m == 11) && d > 30){
+					Day.string = new MFString (30);
+				}
+			}
+			// Decrease Year if chosen
+			if ( YearButton.enabled == FALSE ){
+				Year.string = new MFString (y-1);
+				y = y-1;
+
+				if ( m == 2 && y % 4 != 0 && d > 28){
+					Day.string = new MFString (28);
+				}
+				else if ( m == 2 && y % 4 == 0 && d > 29){
+					Day.string = new MFString (29);
+				}
+			}
+			// Change AM PM	if chosen
+			if ( ampmButton.enabled == FALSE ){
+				if ( a == 'PM' ){
+					ampm.string = new MFString ('AM');
+				}
+				else{
+					ampm.string = new MFString ('PM');
+				}					
+			}
+			////////////////////////////////////////Alarm//////////////////////////////////
+			hour = parseInt(h.string);
+			minute = parseInt(min.string);
+			per = p.string;
+			o = onoff.string;
+			// Change Alarm hour if chosen 
+			if ( hButton.enabled == FALSE ){
+				onoff.string = new MFString ('OFF'); 
+				if ( hour == 0 ){
+					h.string = new MFString (11);
+				}
+				else{
+					h.string = new MFString (hour-1);
+				}					
+			}
+			// Change Alarm minute if chosen 
+			if ( mButton.enabled == FALSE ){
+				onoff.string = new MFString ('OFF');
+				if ( minute == 0 ){
+					min.string = new MFString (59);
+				}
+				else{
+					min.string = new MFString (minute-1);
+				}					
+			}
+			// Change Alarm AM PM if chosen 
+			if ( pButton.enabled == FALSE ){
+				onoff.string = new MFString ('OFF'); 
+				if ( per == 'PM' ){
+					p.string = new MFString ('AM');
+				}
+				else{
+					p.string = new MFString ('PM');
+				}					
+			}
+			// Change Alarm On Off if chosen 
+			if ( onoffButton.enabled == FALSE ){
+				if ( o == 'OFF' ){
+					onoff.string = new MFString ('ON');
+				}
+				else{
+					onoff.string = new MFString ('OFF'); 
+				}					
+			} 						  
+		}"
+}
+ROUTE dateIncButton.isActive TO dateIncrease.set_active
+ROUTE dateDecButton.isActive TO dateDecrease.set_active
