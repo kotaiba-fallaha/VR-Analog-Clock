@@ -1,4 +1,4 @@
-# VRML-Project
+# VRML-Clock 
 Setting alarm using analog clock in virtual reality
 
 My first virtual reality project :-) </br>
