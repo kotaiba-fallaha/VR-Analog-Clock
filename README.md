@@ -1,7 +1,5 @@
 # VR-Analog-Clock
-Analog clock in Virtual Reality using VRML.
-
-The alarm rings depending on the position of the clock hands not on the PC clock. So when we change the time in our virtual reality clock and set a new alarm it still works as supposed to.  
+I designed the alarm to ring based on the position of the clock hands within the virtual reality environment, independent of the PC clock. This allows to set an alarm within VR that functions even after adjusting the virtual clock.  
 
 Video presentation:
 https://www.youtube.com/watch?v=-4TgRzIKH64
